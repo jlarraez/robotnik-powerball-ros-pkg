@@ -1,0 +1,20 @@
+<package>
+  <description brief="robotnik_powerball_pad">
+
+     Allow to use a pad with robotnik_powerball_driver.
+
+  </description>
+  <author>Robotnik Automation SLL</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/robotnik_powerball_pad</url>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+  <depend package="wsg_50"/>
+  <export>
+    <cpp cflags="-I${prefix}/include  -I${prefix}/msg_gen/cpp/include -I${prefix}/srv_gen/cpp/include"/>
+  </export>
+  
+</package>
+
+

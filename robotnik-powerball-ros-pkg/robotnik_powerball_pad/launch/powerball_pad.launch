@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+
+ <!-- joy node -->
+  <node name="joy" pkg="joy" type="joy" respawn="true">
+    <param name="dev" type="string" value="/dev/input/js0" />
+    <param name="deadzone" value="0.12" />
+  </node>
+
+  <!-- Parameters -->
+  <rosparam command="load" file="$(find robotnik_powerball_pad)/launch/ps3.yaml" />
+  <node name="robotnik_powerball_pad" pkg="robotnik_powerball_pad" type="robotnik_powerball_pad" output="screen"/>
+  
+</launch>
+

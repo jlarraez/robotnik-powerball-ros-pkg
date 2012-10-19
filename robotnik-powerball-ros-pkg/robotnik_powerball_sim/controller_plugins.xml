@@ -1,0 +1,5 @@
+<library path="lib/libpowerball_cart_controller_lib">
+  <class name="PowerballCartControllerPlugin" 
+         type="powerball_cart_controller_ns::PowerballCartController"           
+         base_class_type="pr2_controller_interface::Controller" />
+</library>

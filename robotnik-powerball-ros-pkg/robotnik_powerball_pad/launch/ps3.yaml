@@ -1,0 +1,8 @@
+num_of_buttons: 7
+button_up_open: 12
+button_down_close: 14
+button_aux: 13
+button_fold: 15
+dead_man_gripper: 10
+dead_man_arm: 9
+button_select: 0

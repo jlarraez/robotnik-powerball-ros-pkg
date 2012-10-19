@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Launch the robot -->
+  
+  <!-- launch an empty world -->
+  <include file="$(find gazebo_worlds)/launch/empty_world.launch" />
+
+  <!-- send powerball urdf to param server -->
+  <!--include file="$(find powerball_description)/launch/upload_powerball_robotnik.launch" /-->
+  <param name="robot_description" textfile="$(find robotnik_powerball_description)/urdf/powerball_robotnik.urdf" />
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="spawn_gazebo_model" pkg="gazebo" type="spawn_model" args="-urdf -param robot_description -model powerball_robotnik -z 0.1 " respawn="false" output="screen"/>
+
+  <rosparam file="$(find robotnik_powerball_sim)/controllers/powerball_controller.yaml" command="load"/>
+
+  <node name="arm_controller_spawner" pkg="pr2_controller_manager" type="spawner" args="arm_controller" />
+
+  <group ns="arm_controller">
+     <node name="arm_joint_trajectory_action_node" pkg="joint_trajectory_action" type="joint_trajectory_action" />
+  </group>
+
+  <!-- Avoid collisions -->
+  <!--include file="$(find powerball_description)/powerball_robotnik_navigation/launch/powerball_robotnik_planning_environment.launch" />
+  <include file="$(find planning_environment)/launch/planning_environment_visualization_prerequisites.launch" />
+  <include file="$(find powerball_description)/powerball_robotnik_navigation/launch/constraint_aware_kinematics.launch" />
+  <include file="$(find powerball_description)/powerball_robotnik_navigation/launch/ompl_planning.launch" />
+  <include file="$(find powerball_description)/powerball_robotnik_navigation/launch/trajectory_filter_server.launch" />
+  <node pkg="move_arm" type="planning_components_visualizer" name="planning_components_visualizer" output="screen" /-->
+
+  <!-- Launch the cartesian controller -->
+  <rosparam file="$(find robotnik_powerball_sim)/powerball_cart_controller.yaml" command="load" />
+  <!--node pkg="pr2_controller_manager" type="spawner" args="powerball_cart_controller" name="powerball_cart_controller" launch-prefix="gdb -ex run -args" /-->
+  <node pkg="pr2_controller_manager" type="spawner" args="powerball_cart_controller" name="powerball_cart_controller" />
+
+
+</launch>

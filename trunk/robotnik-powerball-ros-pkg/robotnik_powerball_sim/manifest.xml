@@ -1,0 +1,27 @@
+<package>
+  <description brief="robotnik_powerball_sim">
+
+     robotnik_powerball_sim
+
+  </description>
+  <author>marc</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/robotnik_powerball_sim</url>
+  <depend package="roscpp"/>
+  <depend package="trajectory_msgs"/>
+  <depend package="kinematics_msgs"/>
+  <depend package="tf"/>
+  <depend package="kdl" />
+  <depend package="pr2_controller_interface" />
+  <depend package="robotnik_powerball_pad"/>
+  <depend package="sensor_msgs"/>
+  <depend package="arm_navigation_msgs"/>
+  <depend package="planning_models"/>
+  <depend package="planning_environment"/>
+  <export>
+    <pr2_controller_interface plugin="${prefix}/controller_plugins.xml" />
+  </export>
+</package>
+
+

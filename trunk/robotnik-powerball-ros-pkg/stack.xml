@@ -1,0 +1,10 @@
+<stack>
+  <description brief="Software to control the Schunk Powerball arm.">
+    A set of packages developed by Robotnik that provides a lot of utilities: arm simulation over Gazebo, cartesian/euler PS3 teleoperation, planning services...
+  </description>
+  <author>Robotnik Automation SLL</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/robotnik-powerball-ros-pkg</url>
+  <depend stack="ros"/>
+</stack>

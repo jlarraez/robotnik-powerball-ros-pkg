@@ -1,0 +1,39 @@
+==1. Package Summary==
+
+The URDF, meshes, and other elements needed in the simulation are contained here. 
+
+ * Autor: [http://www.robotnik.eu/ Robotnik Automation]
+ * License: BSD
+ * Source: svn http://robotnik-powerball-ros-pkg.googlecode.com/svn/trunk/robotnik-powerball-ros-pkg/trunk/robotnik_powerball_description
+ 
+==2. Folders ==
+
+===2.1. launch===
+
+Contains the different launch files of the different robots/environments (guardian, gball, robotnik,...).
+
+===2.2. Media===
+
+Contains the textures, models and scripts to represent the Robotnik simulated world incorporated in the package.
+
+===2.3 meshes===
+
+This folder has the meshes of the *basic* Guardian robot organized by part (chassis, wheel, others...) and by model (v5, v6, especial version...), so it allow easily changes in the URDF.
+
+===2.4 models===
+
+Contain models like the Robotnik environment STL used in simulation.
+
+===2.5 urdf===
+
+Contains the different URDF's, both for basic and modified versions like GBALL, GWAM.
+
+===2.6 worlds===
+
+Contain the worlds used in simulation (empty.world, robotnik.world, outdoor.world...).
+
+==3. Start up==
+
+ * *roslaunch guardian_description guardian.launch* to get a complete simulated Guardian in a empty space.
+ * *roslaunch guardian_description guardian_robotnik.launch* to get a complete  simulated Guardian in a Robotnik environment running in Gazebo.
+ * *roslaunch guardian_description guardian_robotnik_empty.launch* to get a complete simulated Guardian in a Robotnik empty environment (only the walls) running in Gazebo.

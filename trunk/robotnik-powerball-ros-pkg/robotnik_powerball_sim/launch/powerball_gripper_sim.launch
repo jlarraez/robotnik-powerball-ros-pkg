@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Launch the robot -->
+  
+  <!-- launch an empty world -->
+  <include file="$(find gazebo_worlds)/launch/empty_world.launch" />
+
+  <!-- send powerball urdf to param server -->
+  <param name="robot_description" textfile="$(find robotnik_powerball_description)/urdf/powerball_gripper.urdf" />
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="spawn_gazebo_model" pkg="gazebo" type="spawn_model" args="-urdf -param robot_description -model powerball -z 0.1 " respawn="false" output="screen"/>
+
+  <rosparam file="$(find robotnik_powerball_sim)/controllers/powerball_controller.yaml" command="load"/>
+
+  <node name="arm_controller_spawner" pkg="pr2_controller_manager" type="spawner" args="arm_controller" />
+
+  <group ns="arm_controller">
+     <node name="arm_joint_trajectory_action_node" pkg="joint_trajectory_action" type="joint_trajectory_action" />
+  </group>
+
+  <!-- Launch the cartesian controller -->
+  <rosparam file="$(find robotnik_powerball_sim)/powerball_cart_controller.yaml" command="load" />
+  <node pkg="pr2_controller_manager" type="spawner" args="powerball_cart_controller" name="powerball_cart_controller"/>
+
+  <!-- Launch the gripper controller -->
+  <include file="$(find wsg_50_simulation)/launch/wsg_50_controllers.launch"/>
+  
+  <!-- Launch the fake driver to provide the same services that in the real gripper -->
+  <node name="wsg_50_sim_driver" pkg="wsg_50_simulation" type="wsg_50_sim_driver" />
+
+
+</launch>

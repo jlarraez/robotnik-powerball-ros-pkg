@@ -30,7 +30,7 @@
   <node pkg="move_arm" type="planning_components_visualizer" name="planning_components_visualizer" output="screen" /-->
 
   <!-- Launch the cartesian controller -->
-  <rosparam file="$(find robotnik_powerball_sim)/powerball_cart_controller.yaml" command="load" />
+  <rosparam file="$(find robotnik_powerball_sim)/powerball_cart_controller_standalone.yaml" command="load" />
   <!-- ¿? Is necessary to add the launch-prefix to get a correct visualization...-->
   <!--node pkg="pr2_controller_manager" type="spawner" args="powerball_cart_controller" name="powerball_cart_controller" launch-prefix="gdb -ex run -args" /-->
   <node pkg="pr2_controller_manager" type="spawner" args="powerball_cart_controller" name="powerball_cart_controller"/>

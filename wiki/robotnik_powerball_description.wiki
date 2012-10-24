@@ -18,4 +18,4 @@ This folder has the meshes of the two Powerball available, the normal one and th
 
 ===2.3 urdf===
 
-This folder has four URDF of the two Powerball available, the normal one and the Robotnik long modificated. Also includes this same Powerball with the gripper attached. *Note that to launch correctly these last URDF is necessary to have the [http://code.google.com/p/wsg50-ros-pkg/ WSG 50 ROS package].*
+This folder has four URDF of the two Powerball available, the normal one and the Robotnik long modificated. Also includes these same Powerball with the gripper attached. *Note that to launch correctly the two last URDF is necessary to have the [http://code.google.com/p/wsg50-ros-pkg/ WSG 50 ROS package].*

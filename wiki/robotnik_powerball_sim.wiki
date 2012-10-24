@@ -1,0 +1,41 @@
+==1. Package Summary==
+
+This package implements the Cartesian/Euler teleoperation basing on KDL computation methods.
+
+
+ * Autor: [http://www.robotnik.eu/ Robotnik Automation]
+ * License: BSD
+ * Source: svn http://robotnik-powerball-pkg.googlecode.com/svn/trunk/robotnik-powerball-ros-pkg/robotnik_powerball_sim
+ 
+==2. Topics ==
+
+===2.1. Subscribed topics===
+
+ * */robotnik_powerball_pad/arm_reference*: Listen the arm reference from the robotnik_powerball_pad (axis values, joint/modes changes...).
+
+===2.2. Published topics===
+
+ * */arm_controller/command*: Used to publish the computed reference to the simulated motors.
+
+==3. Start up==
+
+ * *roslaunch robotnik_powerball_sim powerball.launch*: Launch a normal Powerball.
+ * *roslaunch robotnik_powerball_sim powerball_robotnik.launch*: Launch a Powerball modified by Robotnik (longer).
+
+We can control the arm in two modes, cartesian/euler pad teleoperation and sending directly joint position commands (trajectory_msgs/JointTrajectory) to the controller topic (/arm_controller/command).
+
+===3.1 Sending commands===
+
+Simply launch _trajectory_msgs/JointTrajectory_ commands to the controller command topic. Example:
+
+{{{
+rostopic pub /arm_controller/command trajectory_msgs/JointTrajectory {'header: {stamp: {secs: 0,nsecs: 0}} ,joint_names: ['arm_1_joint', 'arm_2_joint', 'arm_3_joint', 'arm_4_joint', 'arm_5_joint', 'arm_6_joint', 'arm_7_joint'], points: [{positions:  [0.707, -0.707, 0, 1, -1, 0], velocities: [], accelerations: [], time_from_start: {secs: 120, nsecs: 0}}]}'
+}}}
+
+===3.2 Pad teleoperation===
+
+ * *roslaunch robotnik_powerball_pad powerball_pad.launch*
+
+When we are controlling with Cartesian/Euler via pad, we actuate directly over the XYZ position of the final effector, but the type of the command sent to the controller are the same as above. Each joint position necessary to reach the desired position are calculated easily thanks to the KDL library.
+
+

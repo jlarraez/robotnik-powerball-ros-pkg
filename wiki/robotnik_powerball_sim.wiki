@@ -19,9 +19,9 @@ This package implements the Cartesian/Euler teleoperation basing on KDL computat
 
 ==3. Start up==
 
- * *roslaunch robotnik_powerball_sim powerball.launch*: Launch a normal Powerball.
+ * *roslaunch robotnik_powerball_sim powerball.launch*: Launch a standard Powerball.
  * *roslaunch robotnik_powerball_sim powerball_robotnik.launch*: Launch a Powerball modified by Robotnik (longer).
- * *roslaunch robotnik_powerball_sim powerball_gripper.launch*: Launch a normal Powerball with a WSG 50 gripper attached.
+ * *roslaunch robotnik_powerball_sim powerball_gripper.launch*: Launch a standard Powerball with a WSG 50 gripper attached.
  * *roslaunch robotnik_powerball_sim powerball_gripper_robotnik.launch*: Launch a Powerball modified by Robotnik (longer) with a WSG 50 gripper attached.
 
 We can control the arm in two modes, cartesian/euler pad teleoperation and sending directly joint position commands (trajectory_msgs/JointTrajectory) to the controller topic (/arm_controller/command).

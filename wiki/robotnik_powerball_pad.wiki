@@ -1,0 +1,21 @@
+==1. Package Summary==
+
+Allows to use a pad with the robotnik_powerball_sim, sending the messages received through the joystick input, correctly adapted, to the "arm_controller/command".
+
+ * Autor: [http://www.robotnik.eu/ Robotnik Automation]
+ * License: BSD
+ * Source: svn http://robotnik-powerball-ros-pkg.googlecode.com/svn/trunk/robotnik-powerball-ros-pkg
+ 
+==2. Topics==
+
+===2.1 Subscribed topics===
+
+ * */joy*: Listen this topic to know the button pressed and the axis value. 
+
+===2.2 Published topics===
+
+ * */arm_controller/command*: Adapt the input coming from /joy to the command that expects *arm_controller*.
+
+==3. Parameters==
+
+You can easily configure the pad map changing the .yaml file that load at the launch file (_default: ps3.yaml_).

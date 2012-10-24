@@ -4,7 +4,7 @@ Allows to use a pad with the robotnik_powerball_sim, sending the messages receiv
 
  * Autor: [http://www.robotnik.eu/ Robotnik Automation]
  * License: BSD
- * Source: svn http://robotnik-powerball-ros-pkg.googlecode.com/svn/trunk/robotnik-powerball-ros-pkg
+ * Source: svn http://robotnik-powerball-ros-pkg.googlecode.com/svn/trunk/robotnik-powerball-ros-pkg/robotnik_powerball_pad
  
 ==2. Topics==
 

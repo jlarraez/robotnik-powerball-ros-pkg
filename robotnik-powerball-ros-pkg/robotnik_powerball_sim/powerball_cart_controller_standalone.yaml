@@ -1,4 +1,4 @@
 powerball_cart_controller:
   type: PowerballCartControllerPlugin
   root_name: base_link
-  tip_name: gripper_base_link
+  tip_name: arm_6_link

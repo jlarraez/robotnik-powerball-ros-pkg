@@ -1,6 +1,6 @@
 ==1. Package Summary==
 
-Allows to use a pad with the robotnik_powerball_sim, sending the messages received through the joystick input, correctly adapted, to the "arm_controller/command".
+Allows to use a pad with the robotnik_powerball_sim, sending the messages received through the joystick input, correctly adapted, to the "arm_controller/command". It is necessary to have correctly installed the [http://code.google.com/p/wsg50-ros-pkg WSG 50 package] to satisfy some dependencies, however, thanks to this we are able to test the Powerball with the gripper.
 
  * Autor: [http://www.robotnik.eu/ Robotnik Automation]
  * License: BSD

@@ -3,3 +3,4 @@ float64 y_position_reference
 float64 z_position_reference
 float64 joint_reference
 float64 aux_reference
+uint8 op_mode

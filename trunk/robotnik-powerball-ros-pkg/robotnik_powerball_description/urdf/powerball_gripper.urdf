@@ -398,6 +398,36 @@
     <material>Gazebo/Grey</material>
     <turnGravityOff>false</turnGravityOff>
   </gazebo>
+  
+  
+  <!-- TOOL LINK -->
+  
+  <joint name="gripper_base_link_tool_joint" type="fixed">
+     <origin xyz="0 0 0.22" rpy="0 0 0" />  
+     <parent link="gripper_base_link"/>
+     <child link="tool_link" />
+     <dynamics friction="100" damping="100" />
+     <axis xyz="1 0 0"/>
+     <limit effort="100" velocity="100"/>
+  </joint>
+  
+   <link name="tool_link">
+      <inertial>
+          <mass value="0.001" />
+          <origin xyz="0 0 0" />
+      	  <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="1.0"  iyz="0.0"  izz="1.0" />
+      </inertial>
+
+      <visual>
+          <origin xyz="0.0 0 0" rpy="0 0 0" />
+          <geometry>
+			<box size="0.000005 0.000005 0.000005"/>
+          </geometry>
+          <material name="red">
+			<color rgba="1 0 0 1"/>
+      	  </material>
+      </visual>
+  </link>
 
 
   <!-- GRIPPER LEFT -->

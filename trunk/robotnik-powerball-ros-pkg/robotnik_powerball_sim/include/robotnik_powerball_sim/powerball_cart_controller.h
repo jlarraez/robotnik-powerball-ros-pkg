@@ -48,6 +48,7 @@
 
 #define CARTESIAN_MODE 	0
 #define EULER_MODE		1
+#define JBJ_TELEOP_MODE 2
 
 
 namespace powerball_cart_controller_ns{
@@ -95,8 +96,10 @@ private:
   
   // Joint limits
   double joint_limits[6];
+  char actualJoint_;
+  int dp;
   
-  // Operation Mode (Cartesian/Euler)
+  // Operation Mode (Cartesian/Euler/JbyJ)
   char opMode;
 
 public:

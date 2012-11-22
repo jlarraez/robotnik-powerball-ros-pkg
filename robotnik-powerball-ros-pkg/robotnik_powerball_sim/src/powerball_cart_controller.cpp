@@ -60,7 +60,7 @@ bool PowerballCartController::init(pr2_mechanism_model::RobotState *robot, ros::
   {
     ROS_ERROR("PowerballCartController could not find a chain from '%s' to '%s'",
               root_name.c_str(), tip_name.c_str());
-	    return false;
+	return false;
   }
 
   // constructs the kdl solvers in non-realtime
@@ -104,13 +104,14 @@ bool PowerballCartController::init(pr2_mechanism_model::RobotState *robot, ros::
   n.param("check_joint_limits", check_joint_limits, true);
   
   // Define joint limits
-  
   joint_limits[0] = 2.97;
   joint_limits[1] = 1.92;
   joint_limits[2] = 2.71;
   joint_limits[3] = 2.97;
   joint_limits[4] = 2.44;
   joint_limits[5] = 2.97;
+  
+  actualJoint_ = 0;
   
 
   return true;
@@ -138,61 +139,103 @@ void PowerballCartController::update()
   // get the joint velocities of the chain
   chain_.getVelocities(jnt_real_vel_);
   
-  for (int i = 0; i < 6; i++){
-		jnt_ref_pos_(i) =  jnt_pos_(i) + jnt_ref_vel_(i);
-  }
-  
-  // 18/10/2012 limit articulations
-  for (int i = 0; i < 6; i++){
-		if(jnt_ref_pos_(i) > joint_limits[i]){
-			jnt_ref_pos_(i) =  joint_limits[i];
-		}else if ( jnt_ref_pos_(i) < ( joint_limits[i] * -1) ){
-			jnt_ref_pos_(i) = joint_limits[i] * -1;
-		}
-  }
- 
-  
   trajectory_msgs::JointTrajectory jt;
   trajectory_msgs::JointTrajectoryPoint pt;
-   
-  jt.header.stamp = ros::Time::now();
-  jt.header.frame_id = "/base_link";
-
-  jt.joint_names.push_back("arm_1_joint");
-  jt.joint_names.push_back("arm_2_joint");
-  jt.joint_names.push_back("arm_3_joint");
-  jt.joint_names.push_back("arm_4_joint");
-  jt.joint_names.push_back("arm_5_joint");
-  jt.joint_names.push_back("arm_6_joint");
-
-  pt.positions.resize(6);
   
-  bool changeConf = false;
+  // If CARTESIAN or EULER mode, works as usual.
+  if (opMode == CARTESIAN_MODE || opMode == EULER_MODE){
+  
+		for (int i = 0; i < 6; i++){
+			jnt_ref_pos_(i) =  jnt_pos_(i) + jnt_ref_vel_(i);
+		}
 
-  for (int i = 0; i < 6; i++) {
+		// 18/10/2012 limit articulations
+		for (int i = 0; i < 6; i++){
+			if(jnt_ref_pos_(i) > joint_limits[i]){
+				jnt_ref_pos_(i) =  joint_limits[i];
+			}else if ( jnt_ref_pos_(i) < ( joint_limits[i] * -1) ){
+				jnt_ref_pos_(i) = joint_limits[i] * -1;
+			}
+		}
+
+
+		//trajectory_msgs::JointTrajectory jt;
+		//trajectory_msgs::JointTrajectoryPoint pt;
+
+		jt.header.stamp = ros::Time::now();
+		jt.header.frame_id = "/base_link";
+
+		jt.joint_names.push_back("arm_1_joint");
+		jt.joint_names.push_back("arm_2_joint");
+		jt.joint_names.push_back("arm_3_joint");
+		jt.joint_names.push_back("arm_4_joint");
+		jt.joint_names.push_back("arm_5_joint");
+		jt.joint_names.push_back("arm_6_joint");
+
+		pt.positions.resize(6);
+
+		bool changeConf = false;
+
+		for (int i = 0; i < 6; i++) {
+		  
+			pt.positions[i] = jnt_ref_pos_(i);
+
+			if ( (pt.positions[i] - pt_ant.positions[i] > 10) || (pt.positions[i] - pt_ant.positions[i] < -10) ){
+				changeConf = true;
+			}
+
+		}
+
+		if (changeConf){
+		//ROS_WARN("CAUTION, CHANGE OF CONFIGURATION!");
+			for(int i = 0; i < 6; i++){
+				pt.positions[i] = pt.positions[i]/8;
+			}
+		}
+
+		pt.time_from_start = ros::Duration(20);
+
+		jt.points.push_back(pt);
+
+		pt_ant = pt;
+
+		arm_com_pub_.publish(jt);	
+		
+  // "New" joint by joint mode (5/Nov/2012)
+  }else if (opMode == JBJ_TELEOP_MODE){
 	  
- 	pt.positions[i] = jnt_ref_pos_(i);
-	
- 	if ( (pt.positions[i] - pt_ant.positions[i] > 10) || (pt.positions[i] - pt_ant.positions[i] < -10) ){
-		changeConf = true;
-	}
+		double targetPos = jnt_pos_(actualJoint_) + (dp * 0.25);
 
+		jt.header.stamp = ros::Time::now();
+		jt.header.frame_id = "/base_link";
+
+		jt.joint_names.push_back("arm_1_joint");
+		jt.joint_names.push_back("arm_2_joint");
+		jt.joint_names.push_back("arm_3_joint");
+		jt.joint_names.push_back("arm_4_joint");
+		jt.joint_names.push_back("arm_5_joint");
+		jt.joint_names.push_back("arm_6_joint");
+
+		pt.positions.resize(6);
+		pt.velocities.resize(6);
+		pt.accelerations.resize(6);
+
+
+		for (int i = 0; i < 6; i++) {
+			if (i == actualJoint_){
+				pt.positions[i] = targetPos;
+			}else{
+				pt.positions[i] = jnt_pos_(i);
+			}
+		}
+
+		pt.time_from_start = ros::Duration(2); //20
+
+		jt.points.push_back(pt);
+
+		arm_com_pub_.publish(jt);
+	  
   }
-   
-  if (changeConf){
- 	//ROS_WARN("CAUTION, CHANGE OF CONFIGURATION!");
-	for(int i = 0; i < 6; i++){
-		pt.positions[i] = pt.positions[i]/8;
-	}
-  }
-
-  pt.time_from_start = ros::Duration(20);
-
-  jt.points.push_back(pt);
-
-  pt_ant = pt;
-
-  arm_com_pub_.publish(jt);	
   	
 }
 
@@ -211,6 +254,9 @@ void PowerballCartController::refCallback(const robotnik_powerball_pad::ArmRef::
 		  opMode = EULER_MODE;
 		  ROS_ERROR("Changed to EULER mode.");
 	  }else if (opMode == EULER_MODE){
+		  opMode = JBJ_TELEOP_MODE;
+		  ROS_ERROR("Changed to JOINT BY JOINT teleop. mode.");
+	  }else if (opMode == JBJ_TELEOP_MODE){
 		  opMode = CARTESIAN_MODE;
 		  ROS_ERROR("Changed to CARTESIAN mode.");
 	  }
@@ -236,6 +282,17 @@ void PowerballCartController::refCallback(const robotnik_powerball_pad::ArmRef::
 	KDL::Vector rot(prx_, pry_, prz_);
 	incr_pos_ = KDL::Twist(vel, rot);
 	
+  }else if (opMode == JBJ_TELEOP_MODE){ // JointByJoint Mode
+  
+	dp = msg->x_position_reference;
+	double jr = msg->joint_reference;
+	
+	if (jr == 1.0 && actualJoint_ < 5){
+		actualJoint_ = actualJoint_ + 1;
+	}else if (jr == -1.0 && actualJoint_ > 0){
+		actualJoint_ = actualJoint_ - 1;
+	}
+	  
   }
   
 }

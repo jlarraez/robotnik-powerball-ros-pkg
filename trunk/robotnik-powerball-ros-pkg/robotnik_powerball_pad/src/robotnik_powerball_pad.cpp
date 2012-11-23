@@ -31,13 +31,20 @@
  * \brief Allows to use a pad with robotnik_powerball_driver.
  */
 
+//#define WSG_50_GRIPPER  	// Uncomment this line if you are using the Powerball with a WSG 50 Gripper
+//#define PRL_70_GRIPPER    // Uncomment this line if you are using the Powerball with a WSG 50 Gripper
+
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 #include <std_srvs/Empty.h>
-#include <wsg_50/Move.h>
-#include <wsg_50/Incr.h>
+#if (defined WSG_50_GRIPPER)
+	#include <wsg_50/Move.h>
+	#include <wsg_50/Incr.h>
+#endif
 #include <robotnik_powerball_pad/ArmRef.h>
+
+
 
 #define DEFAULT_NUM_OF_BUTTONS		20
 
@@ -109,8 +116,10 @@ PowerballPad::PowerballPad(){
 	pad_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &PowerballPad::padCallback, this);
 
 	// Request service to send commands to the gripper/arm
+	#if (defined WSG_50_GRIPPER)
 	gripper_move_client = nh_.serviceClient<wsg_50::Incr>("/wsg_50/move_incrementally");
 	gripper_grasp_client = nh_.serviceClient<wsg_50::Move>("/wsg_50/grasp");
+	#endif
 	arm_setOperationMode_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_powerball_driver/set_operation_mode");
 	arm_fold_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_powerball_driver/fold");
 
@@ -124,6 +133,7 @@ void PowerballPad::padCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 	robotnik_powerball_pad::ArmRef arm;
 
+	#if (defined WSG_50_GRIPPER)
 	// GRIPPER MOVEMENTS
 
   	// Actions dependant on gripper dead-man button
@@ -162,6 +172,7 @@ void PowerballPad::padCallback(const sensor_msgs::Joy::ConstPtr& joy)
 		}
 		
 	}
+	#endif
 	
 	// ARM MOVEMENTS
 	

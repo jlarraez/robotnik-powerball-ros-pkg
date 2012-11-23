@@ -4,7 +4,7 @@ The URDF, meshes, and other elements needed in the simulation are contained here
 
  * Autor: [http://www.robotnik.eu/ Robotnik Automation]
  * License: BSD
- * Source: svn http://robotnik-powerball-ros-pkg.googlecode.com/svn/robotnik-powerball-ros-pkg/trunk/robotnik_powerball_description
+ * Source: svn http://robotnik-powerball-ros-pkg.googlecode.com/svn/trunk/robotnik-powerball-ros-pkg/robotnik_powerball_description
  
 ==2. Folders ==
 

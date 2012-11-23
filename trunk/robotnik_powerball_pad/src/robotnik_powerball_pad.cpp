@@ -32,15 +32,14 @@
  */
 
 //#define WSG_50_GRIPPER  	// Uncomment this line if you are using the Powerball with a WSG 50 Gripper
-//#define PRL_70_GRIPPER    // Uncomment this line if you are using the Powerball with a WSG 50 Gripper
 
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 #include <std_srvs/Empty.h>
 #if (defined WSG_50_GRIPPER)
-	#include <wsg_50/Move.h>
-	#include <wsg_50/Incr.h>
+	#include <wsg_50_common/Move.h>
+	#include <wsg_50_common/Incr.h>
 #endif
 #include <robotnik_powerball_pad/ArmRef.h>
 
@@ -117,8 +116,8 @@ PowerballPad::PowerballPad(){
 
 	// Request service to send commands to the gripper/arm
 	#if (defined WSG_50_GRIPPER)
-	gripper_move_client = nh_.serviceClient<wsg_50::Incr>("/wsg_50/move_incrementally");
-	gripper_grasp_client = nh_.serviceClient<wsg_50::Move>("/wsg_50/grasp");
+	gripper_move_client = nh_.serviceClient<wsg_50_common::Incr>("/wsg_50/move_incrementally");
+	gripper_grasp_client = nh_.serviceClient<wsg_50_common::Move>("/wsg_50/grasp");
 	#endif
 	arm_setOperationMode_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_powerball_driver/set_operation_mode");
 	arm_fold_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_powerball_driver/fold");
@@ -141,7 +140,7 @@ void PowerballPad::padCallback(const sensor_msgs::Joy::ConstPtr& joy)
 		if (joy->buttons[button_up_open_] == 1){
 			if(!bRegisteredButtonEvent[button_up_open_]){
 				//ROS_ERROR("OPEN GRIPPER");
-				wsg_50::Incr incr_srv;
+				wsg_50_common::Incr incr_srv;
 				incr_srv.request.direction = "open"; 
 				incr_srv.request.increment = 10;
 				gripper_move_client.call(incr_srv);
@@ -150,7 +149,7 @@ void PowerballPad::padCallback(const sensor_msgs::Joy::ConstPtr& joy)
 		}else if (joy->buttons[button_down_close_] == 1){
 			if(!bRegisteredButtonEvent[button_down_close_]){
 				//ROS_ERROR("CLOSE GRIPPER");
-				wsg_50::Incr incr_srv;
+				wsg_50_common::Incr incr_srv;
 				incr_srv.request.direction = "close"; 
 				incr_srv.request.increment = 10;
 				gripper_move_client.call(incr_srv);
@@ -159,7 +158,7 @@ void PowerballPad::padCallback(const sensor_msgs::Joy::ConstPtr& joy)
 		}else if (joy->buttons[button_aux_] == 1){
 			if(!bRegisteredButtonEvent[button_aux_]){
 				//ROS_ERROR("GRASP WITH GRIPPER");
-				wsg_50::Move grasp_srv;
+				wsg_50_common::Move grasp_srv;
 				grasp_srv.request.width = 0.0; 
 				grasp_srv.request.speed = 10.0;
 				gripper_grasp_client.call(grasp_srv);

@@ -10,7 +10,7 @@
   <url>http://ros.org/wiki/robotnik_powerball_pad</url>
   <depend package="roscpp"/>
   <depend package="sensor_msgs"/>
-  <depend package="wsg_50_common"/>
+  <!--depend package="wsg_50_common"/--> 		<!-- Uncomment this line if you are using the Powerball with a WSG 50 Gripper -->
   <export>
     <cpp cflags="-I${prefix}/include  -I${prefix}/msg_gen/cpp/include -I${prefix}/srv_gen/cpp/include"/>
   </export>

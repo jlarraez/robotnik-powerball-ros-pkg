@@ -42,10 +42,6 @@
 	#include <wsg_50_common/Incr.h>
 #endif
 #include <robotnik_powerball_pad/ArmRef.h>
-#if (defined PG_70_GRIPPER)
-	#include <robotnik_pg70_driver/Move.h>
-	#include <robotnik_pg70_driver/MoveIncr.h>
-#endif
 
 #define DEFAULT_NUM_OF_BUTTONS		20
 #define ARM							0
@@ -130,7 +126,7 @@ PowerballPad::PowerballPad(){
 	gripper_grasp_client = nh_.serviceClient<wsg_50_common::Move>("/wsg_50/grasp");
 	#endif
 	#if (defined PG_70_GRIPPER)
-	gripper_move_incr_client = nh_.serviceClient<robotnik_pg70_driver::MoveIncr>("/robotnik_pg70_driver/move_incrementally");
+	//gripper_move_incr_client = nh_.serviceClient<robotnik_pg70_driver::MoveIncr>("/robotnik_pg70_driver/move_incrementally");
 	gripper_move_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_pg70_driver/open");
 	gripper_close_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_pg70_driver/close_can_comm");
 	gripper_setOperationMode_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_pg70_driver/set_operation_mode");

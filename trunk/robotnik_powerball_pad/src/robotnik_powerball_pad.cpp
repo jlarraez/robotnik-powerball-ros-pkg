@@ -32,7 +32,7 @@
  */
 
 //#define WSG_50_GRIPPER  	// Uncomment this line if you are using the Powerball with a WSG 50 Gripper
-
+#define PG_70_GRIPPER	    // Uncomment this line if you are using the Powerball with a PG+ 70 Gripper
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
@@ -42,10 +42,14 @@
 	#include <wsg_50_common/Incr.h>
 #endif
 #include <robotnik_powerball_pad/ArmRef.h>
-
-
+#if (defined PG_70_GRIPPER)
+	#include <robotnik_pg70_driver/Move.h>
+	#include <robotnik_pg70_driver/MoveIncr.h>
+#endif
 
 #define DEFAULT_NUM_OF_BUTTONS		20
+#define ARM							0
+#define GRIPPER						1
 
 
 class PowerballPad
@@ -61,7 +65,7 @@ class PowerballPad
 
 	double l_scale_;
 	//! It will publish into command velocity (for the robot)
-	ros::Publisher arm_ref_pub_;
+	ros::Publisher arm_ref_pub_, gripper_ref_pub_;
 	//! It will be suscribed to the joystick
 	ros::Subscriber pad_sub_;
 
@@ -79,11 +83,17 @@ class PowerballPad
 	int dead_man_gripper_;
 	//! buttons to the arm
 	int dead_man_arm_;
+	//! current connection (0: arm, 1: gripper)
+	short deviceConnected;
 	//! Service to move the gripper/arm
+	ros::ServiceClient gripper_setOperationMode_client;
 	ros::ServiceClient gripper_move_client;
-	ros::ServiceClient gripper_grasp_client;
+	ros::ServiceClient gripper_move_incr_client;
+	ros::ServiceClient gripper_close_client;
+	
 	ros::ServiceClient arm_setOperationMode_client;
 	ros::ServiceClient arm_fold_client;
+	ros::ServiceClient arm_close_client;
 	
 };
 
@@ -119,21 +129,33 @@ PowerballPad::PowerballPad(){
 	gripper_move_client = nh_.serviceClient<wsg_50_common::Incr>("/wsg_50/move_incrementally");
 	gripper_grasp_client = nh_.serviceClient<wsg_50_common::Move>("/wsg_50/grasp");
 	#endif
+	#if (defined PG_70_GRIPPER)
+	gripper_move_incr_client = nh_.serviceClient<robotnik_pg70_driver::MoveIncr>("/robotnik_pg70_driver/move_incrementally");
+	gripper_move_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_pg70_driver/open");
+	gripper_close_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_pg70_driver/close_can_comm");
+	gripper_setOperationMode_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_pg70_driver/set_operation_mode");
+	#endif
 	arm_setOperationMode_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_powerball_driver/set_operation_mode");
 	arm_fold_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_powerball_driver/fold");
+	arm_close_client = nh_.serviceClient<std_srvs::Empty>("/robotnik_powerball_driver/close_can_comm");
 
 	//Publishes into the arm controller
 	arm_ref_pub_ = nh_.advertise<robotnik_powerball_pad::ArmRef>("/robotnik_powerball_pad/arm_reference", 1);
-
+	#if (defined PG_70_GRIPPER)
+	gripper_ref_pub_ = nh_.advertise<robotnik_powerball_pad::ArmRef>("/robotnik_pg70_driver/finger_reference", 1);
+	#endif
+	
 }
 
 void PowerballPad::padCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
 
 	robotnik_powerball_pad::ArmRef arm;
+	robotnik_powerball_pad::ArmRef finger;
+
 
 	#if (defined WSG_50_GRIPPER)
-	// GRIPPER MOVEMENTS
+	// WSG50 GRIPPER MOVEMENTS
 
   	// Actions dependant on gripper dead-man button
  	if (joy->buttons[dead_man_gripper_] == 1) {
@@ -173,10 +195,64 @@ void PowerballPad::padCallback(const sensor_msgs::Joy::ConstPtr& joy)
 	}
 	#endif
 	
+	#if (defined PG_70_GRIPPER)
+	// PG+ 70 GRIPPER MOVEMENTS
+
+  	// Actions dependant on gripper dead-man button
+ 	if (joy->buttons[dead_man_gripper_] == 1 && joy->buttons[dead_man_arm_] == 0) {
+		if (joy->buttons[button_up_open_] == 1){
+			if(!bRegisteredButtonEvent[button_up_open_]){
+				//ROS_ERROR("OPEN GRIPPER");
+				//robotnik_pg70_driver::MoveIncr incr_srv;
+				//incr_srv.request.direction = "open"; 
+				//incr_srv.request.increment = 10000;
+				//gripper_move_incr_client.call(incr_srv);
+				
+				
+				//robotnik_pg70_driver::MoveIncr incr_srv;
+				//gripper_move_client.call(move_srv);
+				
+				std_srvs::Empty srv_empty;
+				gripper_move_client.call(srv_empty);
+				
+				bRegisteredButtonEvent[button_up_open_] = true;
+			}
+		/*	
+		}else if (joy->buttons[button_down_close_] == 1){
+			if(!bRegisteredButtonEvent[button_down_close_]){
+				//ROS_ERROR("CLOSE GRIPPER");
+				robotnik_pg70_driver::MoveIncr incr_srv;
+				incr_srv.request.direction = "close"; 
+				incr_srv.request.increment = 10000;
+				gripper_move_incr_client.call(incr_srv);
+				bRegisteredButtonEvent[button_down_close_] = true;
+			}
+		*/ 
+		}else if (joy->buttons[button_aux_] == 1){
+			if(!bRegisteredButtonEvent[button_aux_]){
+				finger.aux_reference = 1;
+				bRegisteredButtonEvent[button_aux_] = true;
+			}
+		}else{
+			
+			finger.x_position_reference = joy->axes[1];
+			
+			bRegisteredButtonEvent[button_up_open_] = false;
+			bRegisteredButtonEvent[button_down_close_] = false;
+			bRegisteredButtonEvent[button_aux_] = false;
+		}
+		
+	}
+	
+	gripper_ref_pub_.publish(finger);
+	#endif
+	
+	
+	
 	// ARM MOVEMENTS
 	
 	// Actions dependant on arm dead-man button
-	if (joy->buttons[dead_man_arm_] == 1){
+	if (joy->buttons[dead_man_arm_] == 1 && joy->buttons[dead_man_gripper_] == 0){
 		
 		if (joy->buttons[button_up_open_] == 1){
 			if(!bRegisteredButtonEvent[button_up_open_]){
@@ -202,13 +278,12 @@ void PowerballPad::padCallback(const sensor_msgs::Joy::ConstPtr& joy)
 					
 			}
 			
-		// Allow selection between the three possible operation modes.
+		// Allow selection between the three possible operation modes
 		}else if (joy->buttons[button_select_] == 1){
 			if(!bRegisteredButtonEvent[button_select_]){
 				bRegisteredButtonEvent[button_select_] = true;
 				std_srvs::Empty srv;
 				arm_setOperationMode_client.call(srv);
-		
 			}
 			
 		// Allow to fold the arm throught the pad	
@@ -231,10 +306,33 @@ void PowerballPad::padCallback(const sensor_msgs::Joy::ConstPtr& joy)
 			bRegisteredButtonEvent[button_select_] = false;
 			bRegisteredButtonEvent[button_fold_] = false;
 		}
-		
 	}
 	
 	arm_ref_pub_.publish(arm);
+	
+	if(joy->buttons[dead_man_gripper_] == 1 && joy->buttons[dead_man_arm_] == 1){
+	
+		if (joy->buttons[button_select_] == 1){
+			if(!bRegisteredButtonEvent[button_select_]){
+				bRegisteredButtonEvent[button_select_] = true;
+				std_srvs::Empty srv;
+				if (deviceConnected == ARM){
+					arm_close_client.call(srv);
+					gripper_setOperationMode_client.call(srv);
+					ROS_ERROR("ARM: DISABLED // GRIPPER: ENABLED");
+					deviceConnected = GRIPPER;
+				}else if (deviceConnected == GRIPPER){
+					gripper_close_client.call(srv);
+					arm_setOperationMode_client.call(srv);
+					ROS_ERROR("ARM: ENABLED // GRIPPER: DISABLED");
+					deviceConnected = ARM;
+				}
+			}
+		}else{
+			bRegisteredButtonEvent[button_select_] = false;
+		}
+		
+	}
 	
 }
 
